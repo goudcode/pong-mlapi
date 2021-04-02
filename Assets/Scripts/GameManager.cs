@@ -1,12 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.SceneManagement;
-using MLAPI.Spawning;
-using MLAPI.Transports.UNET;
 using TMPro;
 using UnityEngine;
 
@@ -16,13 +11,24 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject ballPrefab;
     [SerializeField] private TextMeshProUGUI scoreText;
 
-    private int scorePlayer1;
-    private int scorePlayer2;
+    private Player player1;
+    private Player player2;
 
     public override void NetworkStart()
     {
-        if (IsHost)
-            StartGame();
+        // Game initialisation should only be executed by host
+        if (!IsHost)
+            return;
+        
+        player1 = NetworkManager.Singleton.ConnectedClients[NetworkManager.Singleton.ServerClientId].PlayerObject
+            .GetComponent<Player>();
+        player2 = NetworkManager.Singleton.ConnectedClients.Last().Value.PlayerObject
+            .GetComponent<Player>();
+            
+        player1.score.Value = 0;
+        player2.score.Value = 0;
+            
+        StartGame();
     }
 
     private void StartGame()
@@ -40,24 +46,20 @@ public class GameManager : NetworkBehaviour
         ball.GetComponent<BallController>().Launch();
     }
 
-    public void AddPoint(bool player1)
+    public void AddPoint(bool isPlayer1)
     {
-        if (player1)
-            scorePlayer1++;
+        if (isPlayer1)
+            player1.score.Value++;
         else
-            scorePlayer2++;
+            player2.score.Value++;
 
-        UpdateScoreClientRpc(scorePlayer1, scorePlayer2);
+        UpdateScoreClientRpc(player1.score.Value, player2.score.Value);
         
-        if (scorePlayer1 >= 5 || scorePlayer2 >= 5)
+        if (player1.score.Value >= 5 || player2.score.Value >= 5)
             NetworkSceneManager.SwitchScene("GameOver");
     }
 
     [ClientRpc]
-    private void UpdateScoreClientRpc(int player1, int player2)
-    {
-        scorePlayer1 = player1;
-        scorePlayer2 = player2;
-        scoreText.text = $"{scorePlayer1} : {scorePlayer2}";
-    }
+    private void UpdateScoreClientRpc(int player1Score, int player2Score)
+        => scoreText.text = $"{player1Score} : {player2Score}";
 }

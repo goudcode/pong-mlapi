@@ -410,7 +410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25781a3c6e58f3c468ecdb0976af5a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPlayer1: 0
+  IsPlayer1: 1
 --- !u!1 &608308526
 GameObject:
   m_ObjectHideFlags: 0
@@ -699,7 +699,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25781a3c6e58f3c468ecdb0976af5a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPlayer1: 1
+  IsPlayer1: 0
 --- !u!1 &1564072107
 GameObject:
   m_ObjectHideFlags: 0
