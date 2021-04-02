@@ -1008,6 +1008,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f225b2098ca3294c98200d23fbbaf4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  paddlePrefab: {fileID: 991519545220705060, guid: 0cd2e27f91a00a74ca33ba645a3a7e37, type: 3}
   ballPrefab: {fileID: 8694869608002119022, guid: d29262fbac5a69a448403f56898702d3, type: 3}
   scoreText: {fileID: 1665994867}
 --- !u!4 &1890637923

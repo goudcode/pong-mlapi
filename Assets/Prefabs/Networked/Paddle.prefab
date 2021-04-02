@@ -133,7 +133,7 @@ MonoBehaviour:
   InterpolatePosition: 1
   SnapDistance: 10
   InterpolateServer: 1
-  MinMeters: 0.1
+  MinMeters: 0.15
   MinDegrees: 1.5
   ExtrapolatePosition: 0
   MaxSendsToExtrapolate: 5

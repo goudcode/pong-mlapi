@@ -55,9 +55,9 @@ public class LobbyNameManager : NetworkBehaviour
 
     private void UpdateNames()
     {
-        var playerNames = NetworkManager.Singleton.ConnectedClientsList.Select(client =>
-            client.PlayerObject.GetComponent<Player>()
-                .playerName.Value);
-        names.Value = playerNames.ToArray();
+        var players = NetworkManager.Singleton.ConnectedClientsList.Select(client =>
+            client.PlayerObject.GetComponent<Player>());
+
+        names.Value = players.Select(p => $"{p.playerName.Value}{(p.IsOwnedByServer ? " (host)" : "")}").ToArray();
     }
 }

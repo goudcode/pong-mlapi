@@ -14,6 +14,7 @@ public class GoalController : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
     }
 
+    //TODO: Research why this is only triggered on the server
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.gameObject.TryGetComponent<BallController>(out var ball))

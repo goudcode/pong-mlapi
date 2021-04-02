@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.SceneManagement;
 using MLAPI.Spawning;
 using MLAPI.Transports.UNET;
 using TMPro;
@@ -10,15 +12,33 @@ using UnityEngine;
 
 public class GameManager : NetworkBehaviour
 {
+    [SerializeField] private GameObject paddlePrefab;
     [SerializeField] private GameObject ballPrefab;
     [SerializeField] private TextMeshProUGUI scoreText;
-    private bool gameStarted = false;
-    private int port = 27017;
 
     private int scorePlayer1;
     private int scorePlayer2;
 
-    private string ipField;
+    public override void NetworkStart()
+    {
+        if (IsHost)
+            StartGame();
+    }
+
+    private void StartGame()
+    {
+        var firstPlayer = Instantiate(paddlePrefab, new Vector3(-5, 0, 0), Quaternion.identity);
+        var firstPlayerNetworkObject = firstPlayer.GetComponent<NetworkObject>();
+        firstPlayerNetworkObject.Spawn(destroyWithScene: true);
+        
+        var secondPlayer = Instantiate(paddlePrefab, new Vector3(5, 0, 0), Quaternion.identity);
+        var secondPlayerNetworkObject = secondPlayer.GetComponent<NetworkObject>();
+        secondPlayerNetworkObject.SpawnWithOwnership(NetworkManager.Singleton.ConnectedClients.Last().Key, destroyWithScene: true);
+
+        var ball = Instantiate(ballPrefab, Vector3.zero, Quaternion.identity);
+        ball.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+        ball.GetComponent<BallController>().Launch();
+    }
 
     public void AddPoint(bool player1)
     {
@@ -26,8 +46,11 @@ public class GameManager : NetworkBehaviour
             scorePlayer1++;
         else
             scorePlayer2++;
-        
+
         UpdateScoreClientRpc(scorePlayer1, scorePlayer2);
+        
+        if (scorePlayer1 >= 5 || scorePlayer2 >= 5)
+            NetworkSceneManager.SwitchScene("GameOver");
     }
 
     [ClientRpc]
@@ -36,51 +59,5 @@ public class GameManager : NetworkBehaviour
         scorePlayer1 = player1;
         scorePlayer2 = player2;
         scoreText.text = $"{scorePlayer1} : {scorePlayer2}";
-    }
-    
-    private void OnGUI()
-    {
-        GUILayout.BeginArea(new Rect(10, 10, 300, 300));
-        if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-            StartButtons();
-        else
-            StatusLabel();
-        
-        GUILayout.EndArea();
-    }
-
-    private void StartButtons()
-    {
-        ipField = GUILayout.TextField(ipField);
-        if (GUILayout.Button("Host"))
-        {
-            NetworkManager.Singleton.GetComponent<UNetTransport>().ServerListenPort = port;
-            NetworkManager.Singleton.StartHost();
-        }
-
-        if (GUILayout.Button("Client"))
-        {
-            NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectPort = port;
-            NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress = ipField;
-            NetworkManager.Singleton.StartClient();
-        }
-    }
-
-    private void StatusLabel()
-    {
-        var mode = NetworkManager.Singleton.IsClient ? "Client" : "Server";
-        GUILayout.Label($"Transport: {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name}");
-        GUILayout.Label($"Mode: {mode}");
-
-        if (!gameStarted && NetworkManager.Singleton.IsHost)
-        {
-            if (GUILayout.Button("Start game"))
-            {
-                gameStarted = true;
-                var ball = Instantiate(ballPrefab, Vector3.zero, Quaternion.identity);
-                ball.GetComponent<NetworkObject>().Spawn();
-                ball.GetComponent<BallController>().Launch();
-            }
-        }
     }
 }
