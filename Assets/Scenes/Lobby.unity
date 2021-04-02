@@ -2621,8 +2621,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 463.7689, y: -234.005}
-  m_SizeDelta: {x: 927.5378, y: 308.01}
+  m_AnchoredPosition: {x: 463.7689, y: -172.95006}
+  m_SizeDelta: {x: 927.5378, y: 185.9001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &3258385093394420016
 PrefabInstance:

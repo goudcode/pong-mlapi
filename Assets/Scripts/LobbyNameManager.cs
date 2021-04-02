@@ -18,7 +18,7 @@ public class LobbyNameManager : NetworkBehaviour
     // Start is called before the first frame update
     public override void NetworkStart()
     {
-        if (IsOwner)
+        if (IsHost)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += UpdateNames;
             NetworkManager.Singleton.OnClientDisconnectCallback += UpdateNames;
@@ -28,18 +28,24 @@ public class LobbyNameManager : NetworkBehaviour
         StartCoroutine(nameof(UpdateLobbyContainer));
     }
 
+    // Executed on all clients, gets the names form the synced names network variable that's set by the server
+    // Only the updating of names is executed by the server
     private IEnumerator UpdateLobbyContainer()
     {
         while (enabled)
         {
             yield return new WaitForSeconds(1);
             
+            if (IsHost)
+                UpdateNames();
+                
             for(var i = lobbyContainer.transform.childCount-1; i >= 0; --i)
                 Destroy(lobbyContainer.transform.GetChild(i).gameObject);
 
-            foreach (var name in names.Value)
+            foreach (var playerName in names.Value)
             {
-                var entry = Instantiate(lobbyNamePrefab, lobbyContainer.transform);
+                var entry = Instantiate(lobbyNamePrefab, lobbyContainer.transform); 
+                entry.GetComponent<LobbyEntry>().ChangeName(playerName);
             }
         }
     }
