@@ -57,7 +57,7 @@ namespace Gameplay
 
             UpdateScoreClientRpc(player1.score.Value, player2.score.Value);
         
-            if (player1.score.Value >= 5 || player2.score.Value >= 5)
+            if (player1.score.Value >= 1 || player2.score.Value >= 1)
                 NetworkSceneManager.SwitchScene("GameOver");
         }
 
